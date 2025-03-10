@@ -1,0 +1,173 @@
+package app;
+
+import service.MatriculaService;
+import service.DadosService;
+import model.Matricula;
+import model.Dados;
+import java.util.Scanner;
+import java.util.List;
+
+public class AppMenuMatricula {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        MatriculaService matriculaService = new MatriculaService();
+        DadosService dadosService = new DadosService();
+
+        int opcao;
+        do {
+            System.out.println("\n===== MENU MATRÍCULAS =====");
+            System.out.println("1 - Incluir Matrícula");
+            System.out.println("2 - Consultar Matrícula");
+            System.out.println("3 - Alterar Matrícula");
+            System.out.println("4 - Excluir Matrícula");
+            System.out.println("0 - Sair");
+            System.out.print("Escolha uma opção: ");
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcao) {
+                case 1:
+                    incluirMatricula(scanner, matriculaService, dadosService);
+                    break;
+                case 2:
+                    consultarMatricula(scanner, matriculaService, dadosService);
+                    break;
+                case 3:
+                    alterarMatricula(scanner, matriculaService, dadosService);
+                    break;
+                case 4:
+                    excluirMatricula(scanner, matriculaService);
+                    break;
+                case 0:
+                    System.out.println("Tchau...");
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (opcao != 0);
+
+        scanner.close();
+    }
+
+    private static void incluirMatricula(Scanner scanner, MatriculaService matriculaService, DadosService dadosService) {
+        System.out.println("\n1.1 - Incluir Matrícula");
+        System.out.print("Digite o nome do aluno: ");
+        String nome = scanner.nextLine();
+        matriculaService.inserir(nome);
+        System.out.println("Matrícula inserida com sucesso!");
+
+        System.out.println("\n1.2 - Incluir Dados");
+        System.out.print("Digite o endereço: ");
+        String endereco = scanner.nextLine();
+        System.out.print("Digite o CEP: ");
+        String cep = scanner.nextLine();
+
+        // Validação da idade
+        int idade = 0;
+        boolean idadeValida = false;
+        while (!idadeValida) {
+            System.out.print("Digite a idade: ");
+            String input = scanner.nextLine().trim(); // Lê como string para evitar erro direto
+
+            // Verifica se o input contém apenas números
+            if (input.matches("\\d+")) {
+                idade = Integer.parseInt(input); // Converte para inteiro
+                idadeValida = true;
+            } else {
+                System.out.println("⚠ Entrada inválida! Digite um número inteiro para a idade.");
+            }
+        }
+
+        System.out.print("Digite o gênero: ");
+        String genero = scanner.nextLine();
+
+        dadosService.inserir(nome, endereco, cep, idade, genero);
+        System.out.println("✅ Dados inseridos com sucesso!");
+    }
+
+    private static void consultarMatricula(Scanner scanner, MatriculaService matriculaService, DadosService dadosService) {
+        System.out.println("\n===== CONSULTA DE MATRÍCULAS =====");
+        System.out.println("1 - Consultar todas");
+        System.out.println("2 - Consultar por nome");
+        System.out.println("3 - Consultar dados da matrícula");
+        System.out.print("Escolha uma opção: ");
+        int escolha = scanner.nextInt();
+        scanner.nextLine();
+
+        if (escolha == 1) {
+            List<Matricula> lista = matriculaService.listarTodas();
+            if (lista.isEmpty()) {
+                System.out.println("Nenhuma matrícula encontrada.");
+            } else {
+                for (Matricula m : lista) {
+                    System.out.println(m.getId() + " - " + m.getNomeCompleto());
+                }
+            }
+        } else if (escolha == 2) {
+            System.out.print("Digite um nome ou parte dele: ");
+            String termo = scanner.nextLine();
+            List<Matricula> resultados = matriculaService.buscarPorNome(termo);
+
+            if (resultados != null && !resultados.isEmpty()) {
+                for (Matricula m : resultados) {
+                    System.out.println(m.getId() + " - " + m.getNomeCompleto());
+                }
+            } else {
+                System.out.println("Nenhum aluno encontrado.");
+            }
+        } else if (escolha == 3) {
+            System.out.print("Digite o ID da matrícula para visualizar os dados: ");
+            long id = scanner.nextLong();
+            scanner.nextLine();
+
+            Dados dados = dadosService.buscarPorId(id);
+            if (dados != null) {
+                System.out.println("\n===== DADOS DA MATRÍCULA =====");
+                System.out.println("Nome: " + dados.getNome());
+                System.out.println("Endereço: " + dados.getEndereco());
+                System.out.println("CEP: " + dados.getCep());
+                System.out.println("Estado: " + dados.getEstado());
+                System.out.println("Cidade: " + dados.getCidade());
+                System.out.println("Idade: " + dados.getIdade());
+                System.out.println("Gênero: " + dados.getGenero());
+            } else {
+                System.out.println("Nenhum dado encontrado para essa matrícula.");
+            }
+        } else {
+            System.out.println("Opção inválida.");
+        }
+    }
+
+    private static void alterarMatricula(Scanner scanner, MatriculaService matriculaService, DadosService dadosService) {
+        System.out.print("\nDigite o ID da matrícula a ser alterada: ");
+        long id = scanner.nextLong();
+        scanner.nextLine();
+
+        Matricula matricula = matriculaService.buscarPorId(id);
+        if (matricula == null) {
+            System.out.println("ID não encontrado. Nenhuma alteração foi feita.");
+            return;
+        }
+
+        System.out.println("3.1 - Alterar Matrícula");
+        System.out.print("Digite o novo nome: ");
+        String novoNome = scanner.nextLine();
+        matriculaService.alterar(id, novoNome);
+        System.out.println("Nome atualizado com sucesso!");
+    }
+
+    private static void excluirMatricula(Scanner scanner, MatriculaService matriculaService) {
+        System.out.print("\nDigite o ID da matrícula a ser excluída: ");
+        long id = scanner.nextLong();
+        scanner.nextLine();
+
+        Matricula matricula = matriculaService.buscarPorId(id);
+        if (matricula == null) {
+            System.out.println("ID não encontrado. Nenhuma exclusão foi realizada.");
+            return;
+        }
+
+        matriculaService.excluir(id);
+        System.out.println("Matrícula excluída com sucesso!");
+    }
+}

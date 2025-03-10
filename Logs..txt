@@ -1,0 +1,14 @@
+Logs.
+
+http://localhost:8080/Api_Matriculas/api/matricula
+
+
+http://localhost:8080/Api_Matriculas/api/matricula/01
+
+http://localhost:8080/Api_Matriculas/api/dados
+
+http://localhost:8080/Api_Matriculas/api/dados
+
+http://localhost:8080/Api_Matriculas/api/dados/05
+
+http://localhost:8080/Api_Matriculas/api/dados

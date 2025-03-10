@@ -1,0 +1,34 @@
+package dao;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import model.Dados;
+
+public class DadosDAO {
+    private final Connection conexao;
+
+    public DadosDAO(Connection conexao) {
+        this.conexao = conexao;
+    }
+
+    public void alterar(long matriculaId, String endereco, String cep, int idade, String genero) throws SQLException {
+        String sql = "UPDATE Dados SET endereco = ?, cep = ?, idade = ?, genero = ? WHERE matricula_id = ?";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, endereco);
+            stmt.setString(2, cep);
+            stmt.setInt(3, idade);
+            stmt.setString(4, genero);
+            stmt.setLong(5, matriculaId);
+
+            int linhasAfetadas = stmt.executeUpdate();
+            if (linhasAfetadas == 0) {
+                throw new SQLException("Nenhum dado atualizado para a matrícula ID: " + matriculaId);
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Erro ao alterar dados da matrícula ID: " + matriculaId + ": " + e.getMessage(), e);
+        }
+    }
+}
+

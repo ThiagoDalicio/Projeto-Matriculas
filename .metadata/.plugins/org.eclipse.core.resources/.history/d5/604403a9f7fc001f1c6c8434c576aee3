@@ -1,0 +1,17 @@
+package api;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+@Path("/teste")
+public class TesteRest {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response verificarServidor() {
+        return Response.ok("O servidor está rodando mau!").build();
+    }
+}

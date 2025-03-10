@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="Api_Matriculas">
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/Matriculas"/>
+        <property name="context-root" value="Api_Matriculas"/>
+        <property name="java-output-path" value="/Api_Matriculas/build/classes"/>
+    </wb-module>
+</project-modules>

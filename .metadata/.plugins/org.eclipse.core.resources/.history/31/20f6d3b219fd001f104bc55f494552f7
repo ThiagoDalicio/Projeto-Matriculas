@@ -1,0 +1,90 @@
+package dao;
+
+import model.Matricula;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MatriculaDAO {
+    private Connection conexao;
+
+    public MatriculaDAO(Connection conexao) {
+        this.conexao = conexao;
+    }
+
+    public void inserir(String nomeCompleto) throws SQLException {
+        String sql = "CALL inserir_matricula(?)"; // Agora chamamos a procedure
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, nomeCompleto);
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<Matricula> listarTodas() throws SQLException {
+        List<Matricula> lista = new ArrayList<>();
+        String sql = "SELECT id, matricula, nome_completo FROM matriculas"; // Agora inclui 'matricula'
+        
+        try (Statement stmt = conexao.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Matricula matricula = new Matricula();
+                matricula.setId(rs.getLong("id"));
+                matricula.setMatricula(rs.getString("matricula")); // Adicionado
+                matricula.setNomeCompleto(rs.getString("nome_completo"));
+                lista.add(matricula);
+            }
+        }
+        return lista;
+    }
+
+    public List<Matricula> buscarPorNome(String termo) throws SQLException {
+        List<Matricula> lista = new ArrayList<>();
+        String sql = "SELECT id, matricula, nome_completo FROM matriculas WHERE nome_completo LIKE ?";
+        
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, "%" + termo + "%"); // Busca parcial
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Matricula matricula = new Matricula();
+                    matricula.setId(rs.getLong("id"));
+                    matricula.setMatricula(rs.getString("matricula")); // Adicionado
+                    matricula.setNomeCompleto(rs.getString("nome_completo"));
+                    lista.add(matricula);
+                }
+            }
+        }
+        return lista;
+    }
+
+    public Matricula buscarPorId(long id) throws SQLException {
+        String sql = "SELECT id, matricula, nome_completo FROM matriculas WHERE id = ?";
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Matricula(rs.getLong("id"), rs.getString("matricula"), rs.getString("nome_completo"), null);
+                }
+            }
+        }
+        return null;
+    }
+
+    public void alterar(long id, String novoNome) throws SQLException {
+        String sql = "UPDATE matriculas SET nome_completo = ? WHERE id = ?";
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, novoNome);
+            stmt.setLong(2, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void excluir(long id) throws SQLException {
+        String sql = "DELETE FROM matriculas WHERE id = ?";
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+}

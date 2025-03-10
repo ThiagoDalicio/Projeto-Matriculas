@@ -1,0 +1,29 @@
+package dao;
+
+import java.sql.*;
+import model.Dados;
+
+public class DadosDAO {
+    private final Connection conexao;
+
+    public DadosDAO(Connection conexao) {
+        this.conexao = conexao;
+    }
+
+    public void inserir(String nome, String endereco, String cep, int idade, String genero) throws SQLException {
+        String sql = "CALL inserir_dados(?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, nome);
+            stmt.setString(2, endereco);
+            stmt.setString(3, cep);
+            stmt.setInt(4, idade);
+            stmt.setString(5, genero);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Erro ao inserir dados para " + nome + ": " + e.getMessage(), e);
+        }
+    }
+}
+
+
